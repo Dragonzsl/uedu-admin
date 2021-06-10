@@ -61,8 +61,8 @@
 				<div style="float: left;">优学管理系统</div>
 				<div style="float: right;font-size: 17px;">
 					<el-link type="success" :underline="false" style="font-size: 17px;">返回前台</el-link>
-					欢迎您:<span></span>
-					<el-link type="primary" style="font-size: 17px;" :underline="false">退出</el-link>
+					欢迎您:<span>{{adminUser}}</span>
+					<el-link type="primary" style="font-size: 17px;" :underline="false" @click="logOut">退出</el-link>
 				</div>
 			</el-header>
 			<el-container>
@@ -102,10 +102,34 @@
 	new Vue({
 		el: "#app",
 		data: {
-
+			adminUser:''
+		},
+		created() {
+			axios.post("http://localhost:8080/uedu/userServlet?ser=doGetUserLog")
+			.then(res => {
+				if(res.data.status==1){
+					this.adminUser= res.data.message
+				}else{
+					this.$message.error(res.data.message)
+					window.setTimeout(() => {
+						window.location.href = "/html/login.html"
+					}, 1000)
+				}
+			})
 		},
 		methods: {
-
+			logOut(){
+				axios.get("http://localhost:8080/uedu/userServlet?ser=doLogOut")
+				.then(res => {
+					if (res.data.status == 1) {
+						
+						this.$message.success(res.data.message)
+						window.setTimeout(() => {
+							window.location.href = "/html/login.html"
+						}, 1000)
+					}
+				})
+			}
 		}
 	})
 </script>

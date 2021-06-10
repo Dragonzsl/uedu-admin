@@ -211,7 +211,6 @@
                 <el-form-item label="验证码" prop="imageCode">
                     <el-input v-model="ruleForm.imageCode" autocomplete="off" style="width: 160px;"></el-input>
                     <div class="codeImg">
-                        <!--                        <img src="../static/img/z2.jpg"/>-->
                         <img :src="imgUrl" @click="changeImg" />
                     </div>
                 </el-form-item>
@@ -270,7 +269,38 @@
         },
         methods: {
             changeImg() {
+                //加参数，浏览器缓存
                 this.imgUrl = 'http://localhost:8080/uedu/code.jpg?t=' + Math.random()
+            },
+            submitForm(formData){
+                this.$refs[formData].validate((vali)=>{
+                    if(vali){
+                        let usp = new URLSearchParams()
+                        usp.append("username",this.ruleForm.username)
+                        usp.append("password",this.ruleForm.password)
+                        usp.append("imageCode",this.ruleForm.imageCode)
+                        usp.append("ser","doAdminLogin")
+                        axios({
+                            method:'post',
+                            url:'http://localhost:8080/uedu/userServlet',
+                            data:usp
+                        }).then((result) => {
+                            // alert(JSON.stringify(result.data))
+                            // alert(result.data.status)
+                            if(result.data.status==1){
+                                // alert("success")
+                                this.$message.success(result.data.message)
+                                window.setTimeout(()=>{
+                                    window.location.href = "/html/index.html"
+                                },1000)
+                            }else{
+                                this.$message.error(result.data.message)
+                            }
+                        }).catch((err) => {
+                            
+                        });
+                    }
+                })
             }
 
         }
