@@ -79,11 +79,15 @@
           { min: 3, max: 11, message: '长度在 3 到 5 个字符', trigger: 'blur' },
 		  {
             validator: function (rule, value, callback) {
-              if ("admin" == value) {
-                callback(new Error("用户名已经存在,请重新输入"));
-              } else {
-                callback();
-              }
+              axios.post("http://localhost:8080/uedu/userServlet?ser=doCheckUsername","username="+value)
+              .then(res => {
+                if (res.data.status==-1) {
+                  callback(new Error("用户名已经存在,请重新输入"));
+                } else {
+                  callback();
+                }
+              })
+              
             }, trigger: 'blur'
           }
         ],
@@ -153,11 +157,41 @@
     methods: {
    
       handleClose() {
-      
+        this.inputVisible = false
       },
  
       submitForm(formName) {
-        
+        this.$refs[formName].validate((vali) => {
+          if (vali) {
+            let usp = new URLSearchParams()
+            usp.append("username", this.ruleForm.username)
+            usp.append("password", this.ruleForm.password)
+            usp.append("name", this.ruleForm.name)
+            usp.append("phone", this.ruleForm.phone)
+            usp.append("status", this.ruleForm.status)
+            usp.append("role", this.ruleForm.role)
+            usp.append("age", this.ruleForm.age)
+            usp.append("sex", this.ruleForm.sex)
+            usp.append("ser", "doAddUser")
+            axios({
+              method: 'post',
+              url: 'http://localhost:8080/uedu/userServlet',
+              data: usp
+            }).then((result) => {
+              if (result.data.status == 1) {
+                this.$message.success(result.data.message)
+                window.setTimeout(() => {
+                  window.location.href = "http://127.0.0.1:5500/html/index.html"
+                }, 1000)
+              } else {
+                this.$message.error(result.data.message)
+                window.setTimeout(() => {
+                  window.location.href = "http://127.0.0.1:5500/html/index.html"
+                }, 1000)
+              }
+            })
+          }
+        })
       },
      
       resetForm(formName) {

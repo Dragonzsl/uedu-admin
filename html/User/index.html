@@ -256,7 +256,34 @@
 				],
 			},
 		},
+		created() {
+			this.handleUserList()
+		},
 		methods: {
+
+			handleUserList(){
+				let usp = new URLSearchParams()
+				usp.append("search",this.search)
+				usp.append("pageSize",this.pageSize)
+				usp.append("currentPage",this.currentPage)
+				usp.append("ser","doPage")
+				axios({
+					method:'post',
+					url: "http://localhost:8080/uedu/userServlet",
+					data: usp
+				}).then(res => {
+					if (res.data.status == 1) {
+						this.tableData= res.data.data.list
+						this.totalCount= res.data.data.totalRecord
+						this.currentPage= res.data.data.pageNo
+					}else{
+						this.$message.error(res.data.message)
+						this.tableData = ''
+						this.totalCount = res.data.data.totalRecord
+						this.currentPage = res.data.data.pageNo
+					}
+				})
+			},
 			
 			handleClose() {
 			
@@ -279,11 +306,13 @@
 			},
 		
 			handleSizeChange: function (size) {
-				
+				this.pageSize=size
+				this.handleUserList()
 			},
 			
 			handleCurrentChange: function (currentPage) {
-				
+				this.currentPage= currentPage
+				this.handleUserList()
 			},
 			findByPage() {
 			
