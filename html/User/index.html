@@ -298,11 +298,37 @@
 			
 			},
 			handleSelectionChange(val) {
-				
+				this.delarr=val
+				// alert(JSON.stringify(this.delarr))
 			},
 			
 			delAll() {
-		
+				this.multipleSelection=[]
+				this.delarr.forEach(val=>{
+					this.multipleSelection.push(val.uid)
+				})
+				// alert(JSON.stringify(this.multipleSelection))
+				let usp = new URLSearchParams()
+				usp.append("uids", this.multipleSelection)
+				usp.append("ser", "doDeleteUser")
+				axios({
+					method:'post',
+					url: "http://localhost:8080/uedu/userServlet",
+					data: usp
+				}).then(res=>{
+					// alert(JSON.stringify(res))
+					if(res.data.status==1){
+						this.$message.success(res.data.message)
+						window.setTimeout(() => {
+							window.location.href = "http://127.0.0.1:5500/html/index.html"
+						}, 1000)
+					}else{
+						this.$message.error(res.data.message)
+						window.setTimeout(() => {
+							window.location.href = "http://127.0.0.1:5500/html/index.html"
+						}, 1000)
+					}
+				})
 			},
 		
 			handleSizeChange: function (size) {
